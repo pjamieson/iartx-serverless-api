@@ -1,0 +1,11 @@
+{
+  "body": "{\"title\":\"Updated Title\",\"primaryImage\":\"different.jpg\"}",
+  "pathParameters": {
+    "id": "318a3b30-7d5e-11e7-8048-1f89e6ea21e6"
+  },
+  "requestContext": {
+    "identity": {
+      "cognitoIdentityId": "USER-SUB-1234"
+    }
+  }
+}

@@ -1,0 +1,170 @@
+service: iartx-serverless-api
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+
+# Use serverless-webpack plugin to transpile ES6/ES7
+plugins:
+  - serverless-webpack
+
+# Enable auto-packing of external modules
+custom:
+  webpackIncludeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: prod
+  region: us-west-2
+
+  # 'iamRoleStatements' defines the permission policy for the Lambda function.
+  # In this case the functions are granted permissions to access DynamoDB.
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:us-west-2:*:*"
+
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+#package:
+#  include:
+#    - include-me.js
+#    - include-me-dir/**
+#  exclude:
+#    - exclude-me.js
+#    - exclude-me-dir/**
+
+functions:
+  create-painting:
+    # Defines an HTTP API endpoint that calls the main function in painting_create.js
+    # - path: url path is /paintings
+    # - method: POST request
+    # - cors: enabled CORS (Cross-Origin Resource Sharing) for browser cross
+    #     domain api call
+    # - authorizer: authenticate using the AWS IAM role
+    handler: painting_create.main
+    events:
+      - http:
+          path: paintings
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  get-painting:
+    # Defines an HTTP API endpoint that calls the main function in painting_get.js
+    # - path: url path is /notes/{id}
+    # - method: GET request
+    handler: painting_get.main
+    events:
+      - http:
+          path: paintings/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  list-paintings:
+    # Defines an HTTP API endpoint that calls the main function in painting_list.js
+    # - path: url path is /paintings
+    # - method: GET request
+    handler: painting_list.main
+    events:
+      - http:
+          path: paintings
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  update-painting:
+    # Defines an HTTP API endpoint that calls the main function in Painting_update.js
+    # - path: url path is /paintings/{id}
+    # - method: PUT request
+    handler: painting_update.main
+    events:
+      - http:
+          path: paintings/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
+
+  delete-painting:
+    # Defines an HTTP API endpoint that calls the main function in painting_delete.js
+    # - path: url path is /paintings/{id}
+    # - method: DELETE request
+    handler: painting_delete.main
+    events:
+      - http:
+          path: paintings/{id}
+          method: delete
+          cors: true
+          authorizer: aws_iam
+
+# Tests
+# serverless webpack invoke --function create-painting --path mocks/painting-create-event.json
+# serverless webpack invoke --function get-painting --path mocks/painting-get-event.json
+# serverless webpack invoke --function list-paintings --path mocks/painting-list-event.json
+# serverless webpack invoke --function update-painting --path mocks/painting-update-event.json
+# serverless webpack invoke --function delete-painting --path mocks/painting-delete-event.json
+
+# endpoints:
+#  POST - https://bkzq1h90og.execute-api.us-west-2.amazonaws.com/prod/paintings
+#  GET - https://bkzq1h90og.execute-api.us-west-2.amazonaws.com/prod/paintings/{id}
+#  GET - https://bkzq1h90og.execute-api.us-west-2.amazonaws.com/prod/paintings
+#  PUT - https://bkzq1h90og.execute-api.us-west-2.amazonaws.com/prod/paintings/{id}
+#  DELETE - https://bkzq1h90og.execute-api.us-west-2.amazonaws.com/prod/paintings/{id}
+
+
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
